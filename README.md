@@ -501,3 +501,361 @@ Everything in Git is an **object referenced by SHA hashes**.
 Understanding **objects, trees, blobs, and commits** makes Git much
 easier to reason about.
 
+
+#                        TEAM
+------------------------------------------------------------------------
+
+# 1. Fork
+
+A **Fork** is a copy of a repository that you can modify **without
+affecting the original repository**.
+
+Typical use case:
+
+-   Contributing to open source projects
+-   Experimenting without touching upstream code
+
+Important:
+
+> Forking is **NOT a Git operation**.
+
+It is a **GitHub / GitLab platform feature**.
+
+------------------------------------------------------------------------
+
+# 2. RERERE
+
+Saw this config while learning:
+
+``` bash
+git config set --local rerere.enabled false
+```
+
+`rerere` means:
+
+    reuse recorded resolution
+
+Git can remember how you resolved a conflict and automatically reuse the
+same resolution later.
+
+For now it was disabled.
+
+------------------------------------------------------------------------
+
+# 3. Pull Request (PR) Workflow
+
+Typical **open source contribution workflow**:
+
+### Step 1 --- Fork the repository
+
+Create your own copy of the repo on GitHub.
+
+### Step 2 --- Clone your fork
+
+``` bash
+git clone <your_fork_repo_url>
+```
+
+### Step 3 --- Create a feature branch
+
+``` bash
+git switch -c your_feature
+```
+
+### Step 4 --- Make changes
+
+Edit files locally.
+
+### Step 5 --- Commit and push
+
+``` bash
+git add .
+git commit -m "feature: added improvement"
+git push origin your_feature
+```
+
+### Step 6 --- Create Pull Request
+
+Create a PR from:
+
+    your_username/repo → original_owner/repo
+
+Example:
+
+    your_feature → main
+
+------------------------------------------------------------------------
+
+# 4. HEAD
+
+`HEAD` tells Git **where you currently are in the repository**.
+
+It is a **reference to the current branch**.
+
+Example:
+
+    HEAD → main → latest commit
+
+------------------------------------------------------------------------
+
+# 5. HEAD Is Just a File
+
+Git literally stores HEAD in a file.
+
+You can inspect it:
+
+``` bash
+cat .git/HEAD
+```
+
+Example output:
+
+    ref: refs/heads/main
+
+This means HEAD currently points to the **main branch**.
+
+------------------------------------------------------------------------
+
+# 6. git reflog
+
+Reflog = **Reference Log**.
+
+Command:
+
+``` bash
+git reflog
+```
+
+Unlike `git log`, reflog shows:
+
+-   movements of HEAD
+-   branch switches
+-   resets
+-   rebases
+
+It is extremely useful for **recovering lost commits**.
+
+------------------------------------------------------------------------
+
+# 7. Recovering Deleted Work
+
+Scenario:
+
+You deleted a branch that had a unique commit.
+
+### Step 1 --- Use reflog
+
+``` bash
+git reflog
+```
+
+Find the commit hash.
+
+### Step 2 --- Inspect the commit
+
+``` bash
+git cat-file -p <hash>
+```
+
+You can explore deeper using:
+
+-   trees
+-   blobs
+
+### Step 3 --- Recover the content
+
+Manually recreate the file and commit again.
+
+------------------------------------------------------------------------
+
+# 8. Easier Recovery (Better Way)
+
+Instead of manually digging blobs, you can simply do:
+
+``` bash
+git merge <commitish>
+```
+
+`commitish` can be:
+
+-   commit hash
+-   branch
+-   tag
+-   HEAD@{1}
+
+Example:
+
+``` bash
+git merge HEAD@{2}
+```
+
+------------------------------------------------------------------------
+
+# 9. Working Directory Across Branches
+
+Interesting behavior discovered.
+
+### Scenario
+
+Created branch:
+
+    add_customers
+
+Modified files.
+
+But accidentally ran:
+
+``` bash
+git add .
+```
+
+inside a subfolder.
+
+So **one file got staged, another didn't**.
+
+Committed staged changes.
+
+Then switched branches:
+
+``` bash
+git switch add_customers
+```
+
+Git showed:
+
+    M customers/all.csv
+
+### Why?
+
+Because:
+
+> Git allows **unstaged changes to move across branches**.
+
+This prevents losing work accidentally.
+
+------------------------------------------------------------------------
+
+# 10. Same Line Changes
+
+It is completely fine if:
+
+-   the same line is modified in a commit
+-   and modified again in a later commit
+
+Git handles that normally.
+
+------------------------------------------------------------------------
+
+# 11. When Conflicts Happen
+
+Problems occur when:
+
+> Two commits modify the **same line** but are **not in a parent‑child
+> relationship**.
+
+Example:
+
+Two branches modify the same line independently.
+
+This causes a **merge conflict**.
+
+------------------------------------------------------------------------
+
+# 12. Merge Conflict Example
+
+Example file content:
+
+    first_name,last_name,company,title
+    <<<<<<< HEAD
+    karson,yummy,intercooler,ceo
+    =======
+    jayson,gross,htmz,contributor
+    >>>>>>> main
+
+Meaning:
+
+-   `HEAD` → current branch
+-   `main` → incoming branch
+
+------------------------------------------------------------------------
+
+# 13. Resolving Merge Conflict
+
+Steps:
+
+1.  Open the conflicted file
+2.  Remove markers:
+
+```{=html}
+<!-- -->
+```
+    <<<<<<<
+    =======
+    >>>>>>>
+
+3.  Keep the correct content
+4.  Stage the file
+
+``` bash
+git add .
+```
+
+5.  Complete the merge with a commit
+
+``` bash
+git commit
+```
+
+------------------------------------------------------------------------
+
+# 14. Ours vs Theirs
+
+During a merge conflict:
+
+    Ours   → branch you are currently on
+    Theirs → branch being merged
+
+------------------------------------------------------------------------
+
+# 15. Resolving Multi‑File Conflicts
+
+Git allows choosing changes automatically.
+
+Example:
+
+``` bash
+git checkout --ours file_path
+```
+
+or
+
+``` bash
+git checkout --theirs file_path
+```
+
+This replaces the file with the selected version.
+
+------------------------------------------------------------------------
+
+# 16. Example
+
+``` bash
+git checkout --theirs customers/all.csv
+```
+
+or
+
+``` bash
+git checkout --ours customers/all.csv
+```
+
+------------------------------------------------------------------------
+
+# Key Takeaways
+
+-   Forking is a **GitHub concept**, not a Git command.
+-   `HEAD` is literally just a file pointing to your branch.
+-   `reflog` can **save you from losing work**.
+-   Merge conflicts occur when **unrelated commits modify the same
+    line**.
+-   `--ours` and `--theirs` help resolve conflicts quickly.
