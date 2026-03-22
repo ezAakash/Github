@@ -859,3 +859,200 @@ git checkout --ours customers/all.csv
 -   Merge conflicts occur when **unrelated commits modify the same
     line**.
 -   `--ours` and `--theirs` help resolve conflicts quickly.
+
+
+
+# Git Notes --- Rebase Conflicts, Detached HEAD & Squashing
+
+Advanced notes from real-world Git workflows.\
+Focus: **rebase conflicts, detached HEAD, commit loss, reset mistakes,
+and squashing**.
+------------------------------------------------------------------------
+
+# 1. Real-World Conflict Scenario
+
+In real development:
+
+-   You create a branch `fix_bug` from `main`
+-   You work on it
+-   Meanwhile, someone updates `main`
+-   You also modify the same files/lines
+-   You open a PR
+-   Git shows **merge conflict**
+-   You resolve conflict
+-   Then complete PR
+
+------------------------------------------------------------------------
+
+# 2. Fixing It (Rebase Approach)
+
+To sync your branch with latest `main`:
+
+``` bash
+git rebase main
+```
+
+⚠ Run this command **from your feature branch**.
+
+------------------------------------------------------------------------
+
+# 3. Detached HEAD During Rebase
+
+During rebase you may see:
+
+    * (no branch, rebasing banned)
+
+### Why?
+
+Because:
+
+> Git temporarily detaches HEAD to replay commits
+
+------------------------------------------------------------------------
+
+# 4. Merge vs Rebase
+
+### Merge
+
+-   Keeps history
+-   HEAD stays on branch
+
+### Rebase
+
+-   Rewrites history
+-   HEAD gets detached
+
+------------------------------------------------------------------------
+
+# 5. Ours vs Theirs (IMPORTANT)
+
+During rebase:
+
+-   `--ours` → refers to **main**
+-   `--theirs` → refers to **your branch**
+
+Because Git is replaying your commits on top of main.
+
+------------------------------------------------------------------------
+
+# 6. Conflict Resolution Flow
+
+``` bash
+git rebase main
+git checkout --ours <file>
+git add .
+git rebase --continue
+```
+
+------------------------------------------------------------------------
+
+# 7. Why Commit Disappeared?
+
+Your commit disappeared because:
+
+-   You chose main's version
+-   Your changes became empty
+-   Git dropped the commit automatically
+
+------------------------------------------------------------------------
+
+# 8. Important Insight
+
+> Rebase removes commits that produce no changes
+
+------------------------------------------------------------------------
+
+# 9. If You Wanted to Keep It
+
+-   Manually merge both changes
+-   Then continue rebase
+
+------------------------------------------------------------------------
+
+# 10. Branch Delete
+
+``` bash
+git branch -d branch
+git branch -D branch
+```
+
+------------------------------------------------------------------------
+
+# 11. Accidental Commit Fix
+
+``` bash
+git reset --soft HEAD~1
+```
+
+------------------------------------------------------------------------
+
+# -------------------- SQUASHING --------------------
+
+# 12. Why Squash?
+
+-   Clean history
+-   Combine commits
+
+------------------------------------------------------------------------
+
+# 13. How to Squash
+
+``` bash
+git rebase -i HEAD~n
+```
+
+Change:
+
+    pick → squash
+
+------------------------------------------------------------------------
+
+# 14. Push After Squash
+
+``` bash
+git push origin main --force
+```
+
+⚠ Dangerous if used carelessly.
+
+------------------------------------------------------------------------
+
+# 15. Why Squash is Scary
+
+-   Lose individual commits
+-   Hard to revert
+
+------------------------------------------------------------------------
+
+# 16. Recovery
+
+``` bash
+git reflog
+```
+
+------------------------------------------------------------------------
+
+# 17. PR Squash Workflow
+
+1.  Create branch
+2.  Work normally
+3.  Squash commits
+4.  Push
+5.  Open PR
+6.  Merge
+
+------------------------------------------------------------------------
+
+# Key Takeaways
+
+-   Rebase rewrites history
+-   Detached HEAD is normal
+-   Commits can disappear if empty
+-   Force push carefully
+-   Reflog is your backup system
+
+
+
+
+
+
