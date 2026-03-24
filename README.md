@@ -1051,6 +1051,10 @@ git reflog
 -   Force push carefully
 -   Reflog is your backup system
 
+---------------------------------------------------------------------------
+
+# git update-ref -d HEAD 
+A plumbing command that deletes the HEAD reference, effectively removing all commits and resetting the repository to an initial state while keeping working directory files intact.
 
 
 
