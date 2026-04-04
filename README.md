@@ -1057,6 +1057,131 @@ git reflog
 A plumbing command that deletes the HEAD reference, effectively removing all commits and resetting the repository to an initial state while keeping working directory files intact.
 
 
+# Git Notes --- Stash, Cherry-Pick, Bisect, Worktree & Tags
+
+Advanced Git concepts focused on **real-world productivity, debugging,
+and workflow optimization**.
+
+------------------------------------------------------------------------
+
+# 1. Git Stash
+
+### What is Stash?
+
+A **stash** is a collection of changes that are not yet committed.
+
+It can include: - Working directory changes - Staged changes
+
+When you stash:
+
+> Git saves your changes and reverts your working directory to the last
+> commit state.
+
+This is useful to **pause work and resume later**.
+
+------------------------------------------------------------------------
+
+### Common Commands
+
+``` bash
+git stash
+git stash -m "message"
+git stash pop
+git stash apply
+git stash drop
+git stash apply stash@{1}
+```
+
+------------------------------------------------------------------------
+
+# 2. Cherry-Pick
+
+### What is Cherry-Pick?
+
+Apply a specific commit from one branch to another.
+
+### Use Case
+
+-   Fix in main
+-   Need same fix in release
+-   Avoid full merge
+
+``` bash
+git cherry-pick <commit-hash>
+```
+
+------------------------------------------------------------------------
+
+# 3. Git Bisect
+
+### What it does
+
+Finds the commit that introduced a bug using binary search.
+
+### Steps
+
+``` bash
+git bisect start
+git bisect good <commit>
+git bisect bad <commit>
+```
+
+Then keep marking:
+
+``` bash
+git bisect good
+git bisect bad
+```
+
+Exit:
+
+``` bash
+git bisect reset
+```
+
+------------------------------------------------------------------------
+
+# 4. Worktree
+
+A worktree is the directory containing your Git files.
+
+Contains: - tracked - untracked - modified files
+
+------------------------------------------------------------------------
+
+# 5. Linked Worktree
+
+-   Separate directory
+-   Shares same repo
+-   Lightweight
+
+Rules:
+
+-   Cannot checkout same branch twice
+-   Stored in `.git/worktrees`
+
+Changes reflect across all worktrees.
+
+------------------------------------------------------------------------
+
+# 6. Tags
+
+A tag is a fixed pointer to a commit.
+
+-   Branch moves
+-   Tag does not
+
+------------------------------------------------------------------------
+
+# Key Takeaways
+
+-   Stash = pause work
+-   Cherry-pick = copy commit
+-   Bisect = debug tool
+-   Worktree = multiple working dirs
+-   Tags = fixed checkpoints
+
+
 
 
 
